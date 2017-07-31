@@ -1,5 +1,4 @@
 #include<stdio.h>
-#include<math.h>
 
 #define uchar unsigned char
 
@@ -31,35 +30,36 @@ uchar * SubSample(uchar YCC[12])
     output[3] = YCC[9];
     int Cb = (YCC[1] + YCC[4] + YCC[7] + YCC[10]) >> 2;
     int Cr = (YCC[2] + YCC[5] + YCC[8] + YCC[11]) >> 2;
+    output[4] = Cb;
+    output[5] = Cr;
     return output;
 }
 
-int * RGBtoYCC(int RGB[3])
+uchar * RGBtoYCC(int RGB[3])
 {
     int * product = matrixMult(RGBtoYCCMatrix, RGB);
-
-    for(int x = 0; x < 3; x++)
-    {
-        product[x] = (product[x]+4096>>13) + scale[x]; //4096 is our magic truncation number
-    }
-    return product;
+    static uchar ycc[3];
+    // Loop unrolling for efficiency
+    ycc[0] = (product[0]+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
+    ycc[1] = (product[1]+4096>>13) + scale[1];
+    ycc[2] = (product[2]+4096>>13) + scale[2];
+    return ycc;
 }
 
-int * YCCtoRGB(int YCC[3])
+uchar * YCCtoRGB(int YCC[3])
 {
-    for(int x = 0; x < 3; x++)
-    {
-        YCC[x] = YCC[x] - scale[x];
-    }
+    YCC[0] = YCC[0] - scale[0];
+    YCC[1] = YCC[1] - scale[1];
+    YCC[2] = YCC[2] - scale[2];
     int * product = matrixMult(YCCtoRGBMatrix, YCC);
-    for(int x = 0; x < 3; x++)
-    {
-        product[x] = (product[x]+4096>>13);
-    }
-    return product;
+    static uchar rgb[3];
+    rgb[0] = (product[0]+4096>>13);
+    rgb[1] = (product[1]+4096>>13);
+    rgb[2] = (product[2]+4096>>13);
+    return rgb;
 }
 
-void printArray(int *array, int size)
+void printArray(uchar *array, int size)
 {
     for(int x = 0; x < size; x++)
     {
