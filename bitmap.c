@@ -99,12 +99,12 @@ int main()
     rowBuffB = malloc(rowSize);
     
     int i = 0;
-    for(; i<height;i+=2)
+    for(; i<height;i+=1)
     {
         fread(rowBuffA, sizeof(uchar), rowSize, bmpFile);
-        fread(rowBuffB, sizeof(uchar), rowSize, bmpFile);
+        //fread(rowBuffB, sizeof(uchar), rowSize, bmpFile);
         ulong j = 0;
-        for(;j<rowSize;j+=6)
+        for(;j<rowSize;j+=12)
         {
             uchar * YCCBuff = malloc(12);
             uchar * ycc;
@@ -119,23 +119,24 @@ int main()
             YCCBuff[4] = ycc[1];
             YCCBuff[5] = ycc[2];
             free(ycc);
-            ycc = BGRtoYCC(rowBuffB + j);
+            ycc = BGRtoYCC(rowBuffA + j + 6);
             
             YCCBuff[6] = ycc[0];
             YCCBuff[7] = ycc[1];
             YCCBuff[8] = ycc[2];
             free(ycc);
-            ycc = BGRtoYCC(rowBuffB + j + 3);
+            ycc = BGRtoYCC(rowBuffA + j + 9);
             
             YCCBuff[9] = ycc[0];
             YCCBuff[10] = ycc[1];
             YCCBuff[11] = ycc[2];
             free(ycc);
-            uchar * subsamp;
-            subsamp = SubSample(YCCBuff);
+            //uchar * subsamp;
+            //subsamp = SubSample(YCCBuff);
+            //fwrite(subsamp, sizeof(uchar), 6, yccFile);
+            fwrite(YCCBuff, sizeof(uchar), 12, yccFile);
             free(YCCBuff);
-            fwrite(subsamp, sizeof(uchar), 6, yccFile);
-            free(subsamp);
+            //free(subsamp);
         }
     }
     free(rowBuffA);
@@ -154,25 +155,26 @@ int main()
     rowBuffB = malloc(rowSize);
 
     int y = 0;
-    for(; y<height; y+=2)
+    for(; y<height; y+=1)
     {
         uchar * YCCBuff;
         uchar * BGRBuff[12];
         uchar *pixBuff[3];
         fread(subRow, sizeof(uchar), rowSize, yccFile);
         int x = 0;
-        for(;x<rowSize; x+=6)
+        for(;x<rowSize; x+=3)
         {
-            YCCBuff = SuperSample(subRow + x);
-            YCCtoBGR(YCCBuff);
-            YCCtoBGR(YCCBuff + 3);
-            YCCtoBGR(YCCBuff + 6);
-            YCCtoBGR(YCCBuff + 9);
-            memcpy((rowBuffA + x), YCCBuff, 6);
-            memcpy((rowBuffB + x), (YCCBuff + 6), 6);
+            //YCCBuff = SuperSample(subRow + x);
+            //YCCtoBGR(YCCBuff);
+            //YCCtoBGR(YCCBuff + 3);
+            //YCCtoBGR(YCCBuff + 6);
+            //YCCtoBGR(YCCBuff + 9);
+            YCCtoBGR(subRow + x);
+            //memcpy((rowBuffA + x), YCCBuff, 6);
+            //memcpy((rowBuffB + x), (YCCBuff + 6), 6);
         }
-        fwrite(rowBuffA, sizeof(uchar), rowSize, newBmpFile);
-        fwrite(rowBuffB, sizeof(uchar), rowSize, newBmpFile);
+        fwrite(subRow, sizeof(uchar), rowSize, newBmpFile);
+        //fwrite(rowBuffB, sizeof(uchar), rowSize, newBmpFile);
     }
     fclose(newBmpFile);
 

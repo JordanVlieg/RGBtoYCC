@@ -11,6 +11,7 @@ short BGRtoYCCMatrix[] = {0x323, 0x1021, 0x839, 0xe0C, 0xf6B0, 0xfb44, 0xfdba, 0
 short YCCtoRGBMatrix[] = {0x253f, 0, 0x3312, 0x253f, 0xf37d, 0xe5fb, 0x253f, 0x408b, 0};
 //float YCCtoRGBMatrix[] = {1.164, 0, 1.596, 1.164, -0.391, -0.813, 1.164, 2.017, 0};
 short YCCtoBGRMatrix[] = {0x253f, 0x408b, 0, 0x253f, 0xf374, 0xe5fb, 0x253f, 0, 0x3312};
+float YCCtoBGRMatrixFFF[] = {1.164, 2.017, 0, 1.164, -0.391, -0.813, 1.164, 0, 1.596};
 
 
 int * matrixMult(short A[9], uchar B[3])
@@ -25,16 +26,36 @@ int * matrixMult(short A[9], uchar B[3])
     return product;
 }
 
-int * matrixMultNEG(short A[9], char B[3])  // Problem with CB in this function
+int * matrixMultNEG(short A[9], char B[3])
 {
     int * product = calloc(3, sizeof(int));
-    for(int x = 0; x < 3; x++)
-    {
-        product[0] = product[0] + (A[x] * B[x]);
-        int midPoint = (A[x+3] * B[x]);
-        product[1] = product[1] + midPoint;
-        product[2] = product[2] + (A[x+6] * B[x]);
-    }
+    int yVal = (uchar)B[0];
+    product[0] = product[0] + (A[0] * yVal);
+    product[1] = product[1] + (A[3] * yVal);
+    product[2] = product[2] + (A[6] * yVal);
+    product[0] = product[0] + (A[1] * B[1]);
+    product[1] = product[1] + (A[4] * B[1]);
+    product[2] = product[2] + (A[7] * B[1]);
+    product[0] = product[0] + (A[2] * B[2]);
+    product[1] = product[1] + (A[5] * B[2]);
+    product[2] = product[2] + (A[8] * B[2]);
+    return product;
+}
+
+int * matrixMultNEGF(float A[9], char B[3])
+{
+    int * product = calloc(3, sizeof(int));
+
+    int yVal = (uchar)B[0];
+    product[0] = product[0] + (A[0] * yVal);
+    product[1] = product[1] + (A[3] * yVal);
+    product[2] = product[2] + (A[6] * yVal);
+    product[0] = product[0] + (A[1] * B[1]);
+    product[1] = product[1] + (A[4] * B[1]);
+    product[2] = product[2] + (A[7] * B[1]);
+    product[0] = product[0] + (A[2] * B[2]);
+    product[1] = product[1] + (A[5] * B[2]);
+    product[2] = product[2] + (A[8] * B[2]);
     return product;
 }
 
@@ -99,9 +120,24 @@ void YCCtoBGR(char * YCC)
     YCC[1] = YCC[1] - scale[1];
     YCC[2] = YCC[2] - scale[2];
     int * product = matrixMultNEG(YCCtoBGRMatrix, YCC);
-    YCC[0] = (product[0]+4096>>13);
-    YCC[1] = (product[1]+4096>>13);
-    YCC[2] = (product[2]+4096>>13);
+    if(product[0]>>13 < 0)
+        YCC[0] = 0;
+    else if(product[0]>>13 == 256)
+        YCC[0] = 255;
+    else
+        YCC[0] = (product[0]>>13);
+    if(product[1]>>13 < 0)
+        YCC[1] = 0;
+    else if(product[1]>>13 == 256)
+        YCC[1] = 255;
+    else
+        YCC[1] = (product[1]>>13);
+    if(product[2]>>13 < 0)
+        YCC[2] = 0;
+    else if(product[2]>>13 == 256)
+        YCC[2] = 255;
+    else
+        YCC[2] = (product[2]>>13);
     return;
 }
 
