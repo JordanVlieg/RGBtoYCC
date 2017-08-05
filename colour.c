@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<stdlib.h>
-
 #include "colour.h"
 
 uchar scale[3] = {16, 128, 128};
@@ -17,7 +16,8 @@ float YCCtoBGRMatrixFFF[] = {1.164, 2.017, 0, 1.164, -0.391, -0.813, 1.164, 0, 1
 int * matrixMult(short A[9], uchar B[3])
 {
     int * product = calloc(3, sizeof(int));
-    for(int x = 0; x < 3; x++)
+    int x = 0;
+    for(; x < 3; x++)
     {
         product[0] = product[0] + (A[x] * B[x]);
         product[1] = product[1] + (A[x+3] * B[x]);
@@ -156,7 +156,8 @@ void YCCtoBGR(char * YCC)
 
 void printArray(uchar *array, int size)
 {
-    for(int x = 0; x < size; x++)
+    int x = 0;
+    for(; x < size; x++)
     {
         printf("%d ", array[x]);
     }
