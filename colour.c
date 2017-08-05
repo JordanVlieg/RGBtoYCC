@@ -28,18 +28,7 @@ int * matrixMult(short A[9], uchar B[3])
 
 int * matrixMultNEG(short A[9], char B[3])
 {
-    int * product = calloc(3, sizeof(int));
-    int yVal = (uchar)B[0];
-    product[0] = product[0] + (A[0] * yVal);
-    product[1] = product[1] + (A[3] * yVal);
-    product[2] = product[2] + (A[6] * yVal);
-    product[0] = product[0] + (A[1] * B[1]);
-    product[1] = product[1] + (A[4] * B[1]);
-    product[2] = product[2] + (A[7] * B[1]);
-    product[0] = product[0] + (A[2] * B[2]);
-    product[1] = product[1] + (A[5] * B[2]);
-    product[2] = product[2] + (A[8] * B[2]);
-    return product;
+    
 }
 
 int * matrixMultNEGF(float A[9], char B[3])
@@ -114,30 +103,30 @@ uchar * BGRtoYCC(uchar * BGR)
     return ycc;
 }
 
-void YCCtoBGR(char * YCC)
+void YCCtoBGR(uchar * colour)
 {
-    YCC[0] = YCC[0] - scale[0];
-    YCC[1] = YCC[1] - scale[1];
-    YCC[2] = YCC[2] - scale[2];
-    int * product = matrixMultNEG(YCCtoBGRMatrix, YCC);
-    if(product[0]>>13 < 0)
-        YCC[0] = 0;
-    else if(product[0]>>13 == 256)
-        YCC[0] = 255;
-    else
-        YCC[0] = (product[0]>>13);
-    if(product[1]>>13 < 0)
-        YCC[1] = 0;
-    else if(product[1]>>13 == 256)
-        YCC[1] = 255;
-    else
-        YCC[1] = (product[1]>>13);
-    if(product[2]>>13 < 0)
-        YCC[2] = 0;
-    else if(product[2]>>13 == 256)
-        YCC[2] = 255;
-    else
-        YCC[2] = (product[2]>>13);
+    uchar yScaled = colour[0] - scale[0];
+    char CbScaled = colour[1] - scale[1];
+    char CrScaled = colour[2] - scale[2];
+
+    int B, G, R;
+    B = YCCtoBGRMatrix[0] * yScaled;
+    G = YCCtoBGRMatrix[3] * yScaled;
+    R = YCCtoBGRMatrix[6] * yScaled;
+    B += YCCtoBGRMatrix[1] * CbScaled;
+    G += YCCtoBGRMatrix[4] * CbScaled;
+    R += YCCtoBGRMatrix[7] * CbScaled;
+    B += YCCtoBGRMatrix[2] * CrScaled;
+    G += YCCtoBGRMatrix[5] * CrScaled;
+    R += YCCtoBGRMatrix[8] * CrScaled;
+
+    B = (B >= 2088960) ? 2088960: B;
+    G = (G >= 2088960) ? 2088960: G;
+    R = (R >= 2088960) ? 2088960: R;
+
+    colour[0] = (B < 0) ? 0: (B+4096>>13);
+    colour[1] = (G < 0) ? 0: (G+4096>>13);
+    colour[2] = (R < 0) ? 0: (R+4096>>13);
     return;
 }
 
@@ -185,6 +174,12 @@ void printArray(uchar *array, int size)
         YCCtoBGR(colourc);
         printArray(colourc, 3);
     }    
-    else
-        printArray(BGRtoYCC(colourc), 3);
-}*/
+    else{
+        uchar * shit;
+        shit = BGRtoYCC(colourc);
+        printArray(shit, 3);
+        YCCtoBGR(shit);
+        printArray(shit, 3);
+        free(shit);
+    }  
+}/*/

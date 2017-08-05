@@ -11,7 +11,7 @@
 
 uchar * BGRtoYCC(uchar * BGR);
 
-void YCCtoBGR(char * YCC);
+void YCCtoBGR(uchar * colour);
 
 uchar * SubSample(uchar * YCC);
 
