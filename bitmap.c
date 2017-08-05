@@ -107,30 +107,23 @@ int main()
         for(;j<rowSize;j+=6)
         {
             uchar * YCCBuff = malloc(12);
-            uchar * ycc;
-            ycc = BGRtoYCC(rowBuffA + j);
-            YCCBuff[0] = ycc[0];
-            YCCBuff[1] = ycc[1];
-            YCCBuff[2] = ycc[2];
-            free(ycc);
-            ycc = BGRtoYCC(rowBuffA + j + 3);
-            
-            YCCBuff[3] = ycc[0];
-            YCCBuff[4] = ycc[1];
-            YCCBuff[5] = ycc[2];
-            free(ycc);
-            ycc = BGRtoYCC(rowBuffB + j);
-            
-            YCCBuff[6] = ycc[0];
-            YCCBuff[7] = ycc[1];
-            YCCBuff[8] = ycc[2];
-            free(ycc);
-            ycc = BGRtoYCC(rowBuffB + j + 3);
-            
-            YCCBuff[9] = ycc[0];
-            YCCBuff[10] = ycc[1];
-            YCCBuff[11] = ycc[2];
-            free(ycc);
+            BGRtoYCC(rowBuffA + j);
+            BGRtoYCC(rowBuffA + j + 3);
+            BGRtoYCC(rowBuffB + j);
+            BGRtoYCC(rowBuffB + j + 3);
+            YCCBuff[0] = rowBuffA[j];
+            YCCBuff[1] = rowBuffA[j + 1];
+            YCCBuff[2] = rowBuffA[j + 2];
+            YCCBuff[3] = rowBuffA[j + 3];
+            YCCBuff[4] = rowBuffA[j + 4];
+            YCCBuff[5] = rowBuffA[j + 5];
+            YCCBuff[6] = rowBuffB[j];
+            YCCBuff[7] = rowBuffB[j + 1];
+            YCCBuff[8] = rowBuffB[j + 2];
+            YCCBuff[9] = rowBuffB[j + 3];
+            YCCBuff[10] = rowBuffB[j + 4];
+            YCCBuff[11] = rowBuffB[j + 5];
+
             uchar * subsamp;
             subsamp = SubSample(YCCBuff);
             free(YCCBuff);

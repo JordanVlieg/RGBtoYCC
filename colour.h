@@ -9,7 +9,7 @@
 #define false               0
 #define true                1
 
-uchar * BGRtoYCC(uchar * BGR);
+void * BGRtoYCC(uchar * colour);
 
 void YCCtoBGR(uchar * colour);
 

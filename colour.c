@@ -91,16 +91,21 @@ uchar * SuperSample(uchar * YCC)
     return ycc;
 }*/
 
-uchar * BGRtoYCC(uchar * BGR)
+void * BGRtoYCC(uchar * colour)
 {
-    int * product = matrixMult(BGRtoYCCMatrix, BGR);
-    uchar * ycc = calloc(3, sizeof(uchar));
-    // Loop unrolling for efficiency
-    ycc[0] = (product[0]+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
-    ycc[1] = (product[1]+4096>>13) + scale[1];
-    ycc[2] = (product[2]+4096>>13) + scale[2];
-    free(product);
-    return ycc;
+    int Y, Cb, Cr;
+    Y = BGRtoYCCMatrix[0] * colour[0];
+    Cb = BGRtoYCCMatrix[3] * colour[0];
+    Cr = BGRtoYCCMatrix[6] * colour[0];
+    Y += BGRtoYCCMatrix[1] * colour[1];
+    Cb += BGRtoYCCMatrix[4] * colour[1];
+    Cr += BGRtoYCCMatrix[7] * colour[1];
+    Y += BGRtoYCCMatrix[2] * colour[2];
+    Cb += BGRtoYCCMatrix[5] * colour[2];
+    Cr += BGRtoYCCMatrix[8] * colour[2];
+    colour[0] = (Y+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
+    colour[1] = (Cb+4096>>13) + scale[1];
+    colour[2] = (Cr+4096>>13) + scale[2];
 }
 
 void YCCtoBGR(uchar * colour)
