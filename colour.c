@@ -1,17 +1,19 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include <inttypes.h>
 #include "colour.h"
 
-uchar scale[3] = {16, 128, 128};
+/*uchar scale[3] = {16, 128, 128};
 // 3.13 Representation
 short RGBtoYCCMatrix[] = {0x839, 0x1021, 0x323, 0xfb44, 0xf6B0, 0xe0C, 0xe0C, 0xf439, 0xfdba};
 short BGRtoYCCMatrix[] = {0x323, 0x1021, 0x839, 0xe0C, 0xf6B0, 0xfb44, 0xfdba, 0xf439, 0xe0C};
 //float RGBtoYCCMatrix[] = {0.257, 0.504, 0.098, -0.148, -0.291, 0.439, 0.439, -0.368, -0.071};
+
 short YCCtoRGBMatrix[] = {0x253f, 0, 0x3312, 0x253f, 0xf37d, 0xe5fb, 0x253f, 0x408b, 0};
 //float YCCtoRGBMatrix[] = {1.164, 0, 1.596, 1.164, -0.391, -0.813, 1.164, 2.017, 0};
 short YCCtoBGRMatrix[] = {0x253f, 0x408b, 0, 0x253f, 0xf374, 0xe5fb, 0x253f, 0, 0x3312};
 float YCCtoBGRMatrixFFF[] = {1.164, 2.017, 0, 1.164, -0.391, -0.813, 1.164, 0, 1.596};
-
+*/
 
 uchar * SubSample(uchar * YCC)
 {
@@ -47,46 +49,46 @@ uchar * SuperSample(uchar * YCC)
 
 void BGRtoYCC(uchar * colour)
 {
+    /* Clamping is not required in this function as for all possible RGB values,
+     the YCbCr will never fall outside the allowed range (Tested)*/
     int Y, Cb, Cr;
-    Y = BGRtoYCCMatrix[0] * colour[0];
-    Cb = BGRtoYCCMatrix[3] * colour[0];
-    Cr = BGRtoYCCMatrix[6] * colour[0];
-    Y += BGRtoYCCMatrix[1] * colour[1];
-    Cb += BGRtoYCCMatrix[4] * colour[1];
-    Cr += BGRtoYCCMatrix[7] * colour[1];
-    Y += BGRtoYCCMatrix[2] * colour[2];
-    Cb += BGRtoYCCMatrix[5] * colour[2];
-    Cr += BGRtoYCCMatrix[8] * colour[2];
-    colour[0] = (Y+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
-    colour[1] = (Cb+4096>>13) + scale[1];
-    colour[2] = (Cr+4096>>13) + scale[2];
+    Y = _0dot098 * colour[0];
+    Cb = _0dot439 * colour[0];
+    Cr = _n0dot071 * colour[0];
+    Y += _0dot504 * colour[1];
+    Cb += _n0dot291 * colour[1];
+    Cr += _n0dot368 * colour[1];
+    Y += _0dot257 * colour[2];
+    Cb += _n0dot148 * colour[2];
+    Cr += _0dot439 * colour[2];
+    colour[0] = ((Y+4096)>>13) + yScale; // 4096 is our magic rounding number for 3.13
+    colour[1] = ((Cb+4096)>>13) + CbScale;
+    colour[2] = ((Cr+4096)>>13) + CrScale;
     return;
 }
 
 void YCCtoBGR(uchar * colour)
 {
-    uchar yScaled = colour[0] - scale[0];
-    char CbScaled = colour[1] - scale[1];
-    char CrScaled = colour[2] - scale[2];
+    uchar yScaled = colour[0] - yScale;
+    char CbScaled = colour[1] - CbScale;
+    char CrScaled = colour[2] - CrScale;
 
     int B, G, R;
-    B = YCCtoBGRMatrix[0] * yScaled;
-    G = YCCtoBGRMatrix[3] * yScaled;
-    R = YCCtoBGRMatrix[6] * yScaled;
-    B += YCCtoBGRMatrix[1] * CbScaled;
-    G += YCCtoBGRMatrix[4] * CbScaled;
-    R += YCCtoBGRMatrix[7] * CbScaled;
-    B += YCCtoBGRMatrix[2] * CrScaled;
-    G += YCCtoBGRMatrix[5] * CrScaled;
-    R += YCCtoBGRMatrix[8] * CrScaled;
+    B = _1dot164 * yScaled;
+    G = _1dot164 * yScaled;
+    R = _1dot164 * yScaled;
+    B += _2dot017 * CbScaled;
+    G += _n0dot391 * CbScaled;
+    G += _n0dot813 * CrScaled;
+    R += _1dot596 * CrScaled;
 
     B = (B >= 2088960) ? 2088960: B;
     G = (G >= 2088960) ? 2088960: G;
     R = (R >= 2088960) ? 2088960: R;
 
-    colour[0] = (B < 0) ? 0: (B+4096>>13);
-    colour[1] = (G < 0) ? 0: (G+4096>>13);
-    colour[2] = (R < 0) ? 0: (R+4096>>13);
+    colour[0] = (B < 0) ? 0: ((B+4096)>>13);
+    colour[1] = (G < 0) ? 0: ((G+4096)>>13);
+    colour[2] = (R < 0) ? 0: ((R+4096)>>13);
     return;
 }
 
