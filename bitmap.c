@@ -65,6 +65,7 @@ void printByteArrayHex(uchar *bytes, int size)
         printf("%x ", bytes[i]);
     }
     printf("\n\n\n");
+    return;
 }
 
 int main()
@@ -72,10 +73,10 @@ int main()
     FILE *bmpFile;
     FILE *newBmpFile;
     FILE *yccFile;
-    bmpFile = fopen("./Fox.bmp", "r");
+    bmpFile = fopen(INPUT_FILE, "r");
     if(bmpFile == NULL) 
     {
-        perror("Error opening file");
+        perror("Error opening input file");
         return -1;
     }
     if(!parseHeaders(bmpFile))
@@ -85,8 +86,8 @@ int main()
     }
     fclose(bmpFile);
 
-    bmpFile = fopen("./Fox.bmp", "r");
-    yccFile = fopen("./ycc.hex", "w+");
+    bmpFile = fopen(INPUT_FILE, "r");
+    yccFile = fopen(COMPRESSED_FILE, "w+");
     fseek (bmpFile, offset, SEEK_SET);
     /*
     printf("File size: %lu\n", getFileSize(headers));
@@ -137,8 +138,8 @@ int main()
     fclose(bmpFile);
     fclose(yccFile);
 
-    yccFile = fopen("./ycc.hex", "r");
-    newBmpFile = fopen("./FoxSub.bmp", "w+");
+    yccFile = fopen(COMPRESSED_FILE, "r");
+    newBmpFile = fopen(OUTPUT_FILE, "w+");
     fwrite(headers, sizeof(uchar), 54, newBmpFile);
 
     uchar * subRow;

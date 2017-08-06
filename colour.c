@@ -13,41 +13,6 @@ short YCCtoBGRMatrix[] = {0x253f, 0x408b, 0, 0x253f, 0xf374, 0xe5fb, 0x253f, 0, 
 float YCCtoBGRMatrixFFF[] = {1.164, 2.017, 0, 1.164, -0.391, -0.813, 1.164, 0, 1.596};
 
 
-int * matrixMult(short A[9], uchar B[3])
-{
-    int * product = calloc(3, sizeof(int));
-    int x = 0;
-    for(; x < 3; x++)
-    {
-        product[0] = product[0] + (A[x] * B[x]);
-        product[1] = product[1] + (A[x+3] * B[x]);
-        product[2] = product[2] + (A[x+6] * B[x]);
-    }
-    return product;
-}
-
-int * matrixMultNEG(short A[9], char B[3])
-{
-    
-}
-
-int * matrixMultNEGF(float A[9], char B[3])
-{
-    int * product = calloc(3, sizeof(int));
-
-    int yVal = (uchar)B[0];
-    product[0] = product[0] + (A[0] * yVal);
-    product[1] = product[1] + (A[3] * yVal);
-    product[2] = product[2] + (A[6] * yVal);
-    product[0] = product[0] + (A[1] * B[1]);
-    product[1] = product[1] + (A[4] * B[1]);
-    product[2] = product[2] + (A[7] * B[1]);
-    product[0] = product[0] + (A[2] * B[2]);
-    product[1] = product[1] + (A[5] * B[2]);
-    product[2] = product[2] + (A[8] * B[2]);
-    return product;
-}
-
 uchar * SubSample(uchar * YCC)
 {
     uchar * subSamp = calloc(6, sizeof(uchar));
@@ -80,18 +45,7 @@ uchar * SuperSample(uchar * YCC)
     return superSamp;
 }
 
-/*uchar * RGBtoYCC(uchar RGB[3])
-{
-    int * product = matrixMult(RGBtoYCCMatrix, RGB);
-    static uchar ycc[3];
-    // Loop unrolling for efficiency
-    ycc[0] = (product[0]+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
-    ycc[1] = (product[1]+4096>>13) + scale[1];
-    ycc[2] = (product[2]+4096>>13) + scale[2];
-    return ycc;
-}*/
-
-void * BGRtoYCC(uchar * colour)
+void BGRtoYCC(uchar * colour)
 {
     int Y, Cb, Cr;
     Y = BGRtoYCCMatrix[0] * colour[0];
@@ -106,6 +60,7 @@ void * BGRtoYCC(uchar * colour)
     colour[0] = (Y+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
     colour[1] = (Cb+4096>>13) + scale[1];
     colour[2] = (Cr+4096>>13) + scale[2];
+    return;
 }
 
 void YCCtoBGR(uchar * colour)
@@ -135,7 +90,18 @@ void YCCtoBGR(uchar * colour)
     return;
 }
 
-/*uchar * YCCtoRGB(int YCC[3])
+/*uchar * RGBtoYCC(uchar RGB[3])
+{
+    int * product = matrixMult(RGBtoYCCMatrix, RGB);
+    static uchar ycc[3];
+    // Loop unrolling for efficiency
+    ycc[0] = (product[0]+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
+    ycc[1] = (product[1]+4096>>13) + scale[1];
+    ycc[2] = (product[2]+4096>>13) + scale[2];
+    return ycc;
+}
+
+uchar * YCCtoRGB(int YCC[3])
 {
     YCC[0] = YCC[0] - scale[0];
     YCC[1] = YCC[1] - scale[1];
@@ -156,6 +122,7 @@ void printArray(uchar *array, int size)
         printf("%d ", array[x]);
     }
     printf("\n");
+    return;
 }
 
 /*void main()
