@@ -3,15 +3,15 @@
 #include <inttypes.h>
 #include "colour.h"
 
-uchar * SubSample(uchar * YCC)
+uchar * SubSample(int * pix)
 {
     uchar * subSamp = calloc(6, sizeof(uchar));
-    subSamp[0] = YCC[0];
-    subSamp[1] = YCC[3];
-    subSamp[2] = YCC[6];
-    subSamp[3] = YCC[9];
-    int Cb = (YCC[1] + YCC[4] + YCC[7] + YCC[10]) >> 2;
-    int Cr = (YCC[2] + YCC[5] + YCC[8] + YCC[11]) >> 2;
+    subSamp[0] = ((pix[0] >> 16) & 0xFF);
+    subSamp[1] = (pix[1] >> 16) & 0xFF;
+    subSamp[2] = (pix[2] >> 16) & 0xFF;
+    subSamp[3] = (pix[3] >> 16) & 0xFF;
+    int Cb = (((pix[0] >> 8) & 0xFF) + ((pix[1] >> 8) & 0xFF) + ((pix[2] >> 8) & 0xFF) + ((pix[3] >> 8) & 0xFF)) >> 2;
+    int Cr = ((pix[0] & 0xFF) + (pix[1] & 0xFF) + (pix[2] & 0xFF) + (pix[3] & 0xFF)) >> 2;
     subSamp[4] = Cb;
     subSamp[5] = Cr;
     return subSamp;
@@ -35,24 +35,25 @@ uchar * SuperSample(uchar * YCC)
     return superSamp;
 }
 
-void BGRtoYCC(uchar * colour)
+int BGRtoYCC(int colour)
 {
     /* Clamping is not required in this function as for all possible RGB values,
      the YCbCr will never fall outside the allowed range (Tested)*/
     int Y, Cb, Cr;
-    Y = _0dot098 * colour[0];
-    Cb = _0dot439 * colour[0];
-    Cr = _n0dot071 * colour[0];
-    Y += _0dot504 * colour[1];
-    Cb += _n0dot291 * colour[1];
-    Cr += _n0dot368 * colour[1];
-    Y += _0dot257 * colour[2];
-    Cb += _n0dot148 * colour[2];
-    Cr += _0dot439 * colour[2];
-    colour[0] = ((Y+4096)>>13) + (scale >> 16); // 4096 is our magic rounding number for 3.13
-    colour[1] = ((Cb+4096)>>13) + ((scale >> 8) & 0xFF);
-    colour[2] = ((Cr+4096)>>13) + (scale & 0xFF);
-    return;
+    Y = _0dot098 * ((colour>>16) & 0xFF);
+    Cb = _0dot439 * ((colour>>16) & 0xFF);
+    Cr = _n0dot071 * ((colour>>16) & 0xFF);
+    Y += _0dot504 * ((colour>>8) & 0xFF);
+    Cb += _n0dot291 * ((colour>>8) & 0xFF);
+    Cr += _n0dot368 * ((colour>>8) & 0xFF);
+    Y += _0dot257 * ((colour) & 0xFF);
+    Cb += _n0dot148 * ((colour) & 0xFF);
+    Cr += _0dot439 * ((colour) & 0xFF);
+    colour ^= colour;
+    colour += (((Y+4096)>>13) + (scale >> 16)) << 16;
+    colour += (((Cb+4096)>>13) + ((scale >> 8) & 0xFF)) << 8;
+    colour += ((Cr+4096)>>13) + (scale & 0xFF);
+    return colour;
 }
 
 int YCCtoBGR(int colour)
@@ -74,7 +75,7 @@ int YCCtoBGR(int colour)
     G = (G >= 2088960) ? 2088960: G;
     R = (R >= 2088960) ? 2088960: R;
 
-    colour = 0;
+    colour ^= colour;
     colour += ((B < 0) ? 0: ((B+4096)>>13)) << 0;
     colour += ((G < 0) ? 0: ((G+4096)>>13)) << 8;
     colour += ((R < 0) ? 0: ((R+4096)>>13)) << 16;

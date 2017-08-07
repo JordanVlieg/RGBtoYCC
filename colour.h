@@ -33,11 +33,11 @@
 
 #define scale           (int)((16<<16)+(128<<8)+128)
 
-void BGRtoYCC(uchar * colour);
+int BGRtoYCC(int colour);
 
 int YCCtoBGR(int colour);
 
-uchar * SubSample(uchar * YCC);
+long SubSample(int * pix);
 
 uchar * SuperSample(uchar * YCC);
 
