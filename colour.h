@@ -8,32 +8,34 @@
 #define WINDOWS_NT_DIBSIZE  40
 #define false               0
 #define true                1
-#define INPUT_FILE           "./Fox.bmp"
-#define OUTPUT_FILE           "./FoxSUB.bmp"
+#define INPUT_FILE           "./bunny.bmp"
+#define OUTPUT_FILE           "./bunnySUB.bmp"
 #define COMPRESSED_FILE           "./ycc.jzv"
 // YCC to BGR
-#define _1dot164        (int16_t)0x253f
-#define _2dot017        (int16_t)0x408b
-#define _n0dot391       (int16_t)0xf374
-#define _n0dot813       (int16_t)0xe5fb
-#define _1dot596        (int16_t)0x3312
+#define _1dot164        0x253f
+#define _2dot017        0x408b
+#define _n0dot391       0xfffff374
+#define _n0dot813       0xffffe5fb
+#define _1dot596        0x3312
 // BGR to YCC
-#define _0dot098        (int16_t)0x323
-#define _0dot504        (int16_t)0x1021
-#define _0dot257        (int16_t)0x839
-#define _0dot439        (int16_t)0xe0C
-#define _n0dot291       (int16_t)0xf6B0
-#define _n0dot148       (int16_t)0xfb44
-#define _n0dot071       (int16_t)0xfdba
-#define _n0dot368       (int16_t)0xf439
+#define _0dot098        0x323
+#define _0dot504        0x1021
+#define _0dot257        0x839
+#define _0dot439        0xe0C
+#define _n0dot291       0xfffff6B0
+#define _n0dot148       0xfffffb44
+#define _n0dot071       0xfffffdba
+#define _n0dot368       0xfffff439
 
 #define yScale          (uint16_t)16
 #define CbScale         (uint16_t)128
 #define CrScale         (uint16_t)128
 
+#define scale           (int)((16<<16)+(128<<8)+128)
+
 void BGRtoYCC(uchar * colour);
 
-void YCCtoBGR(uchar * colour);
+int YCCtoBGR(int colour);
 
 uchar * SubSample(uchar * YCC);
 

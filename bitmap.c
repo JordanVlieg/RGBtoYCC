@@ -11,6 +11,11 @@ uInt offset;
 uchar * rowBuffA;
 uchar * rowBuffB;
 
+int charArrToInt(uchar * chars)
+{
+    return (chars[0]<<16)+(chars[1]<<8)+(chars[2]);
+}
+
 uInt littleEndToInt(uchar *bytes)
 {
     return bytes[0] + (bytes[1] << 8) + (bytes[2] << 16) + (bytes[3] << 24);
@@ -212,12 +217,24 @@ int main()
         for(;x<rowBytesSize; x+=6)
         {
             YCCBuff = SuperSample(subRow + x);
-            YCCtoBGR(YCCBuff);
-            YCCtoBGR(YCCBuff + 3);
-            YCCtoBGR(YCCBuff + 6);
-            YCCtoBGR(YCCBuff + 9);
-            memcpy((rowBuffA + x), YCCBuff, 6);
-            memcpy((rowBuffB + x), (YCCBuff + 6), 6);
+            int shit[4];
+            shit[0] = charArrToInt(YCCBuff);
+            shit[1] = charArrToInt(YCCBuff + 3);
+            shit[2] = charArrToInt(YCCBuff + 6);
+            shit[3] = charArrToInt(YCCBuff + 9);
+            shit[0] = YCCtoBGR(shit[0]);
+            shit[1] = YCCtoBGR(shit[1]);
+            shit[2] = YCCtoBGR(shit[2]);
+            shit[3] = YCCtoBGR(shit[3]);
+            memcpy((rowBuffA + x), shit, 3);
+            memcpy((rowBuffA + x + 3), shit + 1, 3);
+            memcpy((rowBuffB + x), shit + 2, 3);
+            memcpy((rowBuffB + x + 3), shit + 3, 3);
+            if(y==0 && x == 0){
+                printArray(YCCBuff, 12);
+                printArray((rowBuffA+x), 6);
+                printf("SHIT: %d %d %d %d\n\n", shit[0], shit[1], shit[2], shit[3]);
+            }
         }
         fwrite(rowBuffA, sizeof(uchar), rowBytesSize, newBmpFile);
         fwrite(pad, sizeof(uchar), padSize, newBmpFile);
@@ -232,9 +249,13 @@ int main()
         for(;x<rowBytesSize; x+=6)
         {
             YCCBuff = SuperSample(subRow + x);
-            YCCtoBGR(YCCBuff);
-            YCCtoBGR(YCCBuff + 3);
-            memcpy((rowBuffA + x), YCCBuff, 6);
+            int shit[4];
+            shit[0] = charArrToInt(YCCBuff);
+            shit[1] = charArrToInt(YCCBuff + 3);
+            shit[0] = YCCtoBGR(shit[0]);
+            shit[1] = YCCtoBGR(shit[1]);
+            memcpy((rowBuffA + x), shit, 3);
+            memcpy((rowBuffA + x + 3), shit+1, 3);
         }
         fwrite(rowBuffA, sizeof(uchar), rowBytesSize, newBmpFile);
         fwrite(pad, sizeof(uchar), padSize, newBmpFile);

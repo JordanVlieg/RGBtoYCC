@@ -61,17 +61,17 @@ void BGRtoYCC(uchar * colour)
     Y += _0dot257 * colour[2];
     Cb += _n0dot148 * colour[2];
     Cr += _0dot439 * colour[2];
-    colour[0] = ((Y+4096)>>13) + yScale; // 4096 is our magic rounding number for 3.13
-    colour[1] = ((Cb+4096)>>13) + CbScale;
-    colour[2] = ((Cr+4096)>>13) + CrScale;
+    colour[0] = ((Y+4096)>>13) + (scale >> 16); // 4096 is our magic rounding number for 3.13
+    colour[1] = ((Cb+4096)>>13) + ((scale >> 8) & 0xFF);
+    colour[2] = ((Cr+4096)>>13) + (scale & 0xFF);
     return;
 }
 
-void YCCtoBGR(uchar * colour)
+int YCCtoBGR(int colour)
 {
-    uchar yScaled = colour[0] - yScale;
-    char CbScaled = colour[1] - CbScale;
-    char CrScaled = colour[2] - CrScale;
+    int yScaled = ((colour>>16) & 0xFF) - (scale >> 16);
+    int CbScaled = ((colour>>8) & 0xFF) - ((scale >> 8) & 0xFF);
+    int CrScaled = ((colour) & 0xFF) - (scale & 0xFF);
 
     int B, G, R;
     B = _1dot164 * yScaled;
@@ -86,10 +86,11 @@ void YCCtoBGR(uchar * colour)
     G = (G >= 2088960) ? 2088960: G;
     R = (R >= 2088960) ? 2088960: R;
 
-    colour[0] = (B < 0) ? 0: ((B+4096)>>13);
-    colour[1] = (G < 0) ? 0: ((G+4096)>>13);
-    colour[2] = (R < 0) ? 0: ((R+4096)>>13);
-    return;
+    colour = 0;
+    colour += ((B < 0) ? 0: ((B+4096)>>13)) << 0;
+    colour += ((G < 0) ? 0: ((G+4096)>>13)) << 8;
+    colour += ((R < 0) ? 0: ((R+4096)>>13)) << 16;
+    return colour;
 }
 
 /*uchar * RGBtoYCC(uchar RGB[3])
@@ -127,7 +128,8 @@ void printArray(uchar *array, int size)
     return;
 }
 
-/*void main()
+/*
+void main()
 {
     printf("Enter Colour Values in format X, X, X\n");
     fflush(stdout);
@@ -145,15 +147,17 @@ void printArray(uchar *array, int size)
     colourc[2] = colour[2];
     if(choice[0] > 1)
     {
-        YCCtoBGR(colourc);
+        //YCCtoBGR(colourc);
         printArray(colourc, 3);
     }    
     else{
-        uchar * shit;
-        shit = BGRtoYCC(colourc);
-        printArray(shit, 3);
-        YCCtoBGR(shit);
-        printArray(shit, 3);
-        free(shit);
+        BGRtoYCC(colourc);
+        printArray(colourc, 3);
+        int blah = charArrToInt(colourc);
+        int newBlah = YCCtoBGR(blah);
+        printf("%d  %d  %d\n", newBlah>>24, (newBlah>>16)&0xFF, (newBlah>>8)&0xFF);
+        //printArray(shit, 3);
+        //free(shit);
     }  
-}/*/
+}
+*/
