@@ -96,6 +96,10 @@ int main()
     yccFile = fopen(COMPRESSED_FILE, "w+");
     fseek (bmpFile, offset, SEEK_SET);
     int padSize = 4 - (rowBytesSize % 4);
+    if(padSize == 4)
+    {
+        padSize = 0;
+    }
     rowBuffA = malloc(rowBytesSize + padSize);
     rowBuffB = malloc(rowBytesSize + padSize);
     
