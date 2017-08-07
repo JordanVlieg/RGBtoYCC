@@ -8,8 +8,8 @@
 #define WINDOWS_NT_DIBSIZE  40
 #define false               0
 #define true                1
-#define INPUT_FILE           "./bunny.bmp"
-#define OUTPUT_FILE           "./bunnySUB.bmp"
+#define INPUT_FILE           "./Fox.bmp"
+#define OUTPUT_FILE           "./FoxSUB.bmp"
 #define COMPRESSED_FILE           "./ycc.jzv"
 // YCC to BGR
 #define _1dot164        0x253f

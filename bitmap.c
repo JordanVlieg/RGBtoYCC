@@ -46,8 +46,6 @@ int parseHeaders(FILE *bmpFile)
     }
     offset = littleEndToInt(headers + 10);
     rowBytesSize = littleEndToInt(headers + 18) * 3;
-    //rowBytesSize = ((littleEndToInt(headers + 18) * 24 +31) / 32) * 4;
-    //printf("Row Size: %lu\n", rowBytesSize);
     height = littleEndToInt(headers + 22);
     if(littleEndToShort(headers  + 28) != 24)
     {
@@ -101,12 +99,19 @@ int main()
     
     
     int i = 0;
-    for(; i<height-1;i+=2)
+    for(; i<height;i+=2)
     {
         fread(rowBuffA, sizeof(uchar), rowBytesSize, bmpFile);
         fseek(bmpFile, padSize, SEEK_CUR);
-        fread(rowBuffB, sizeof(uchar), rowBytesSize, bmpFile);
-        fseek(bmpFile, padSize, SEEK_CUR);
+        if((height % 2 == 1) && (i == height-1))
+        {
+            memcpy(rowBuffB, rowBuffA, rowBytesSize);
+        }
+        else
+        {
+            fread(rowBuffB, sizeof(uchar), rowBytesSize, bmpFile);
+            fseek(bmpFile, padSize, SEEK_CUR);
+        }
         if(padSize % 2 == 1)
         {
             // JANKY SHIT BE HAPPNIN HERE
@@ -145,49 +150,6 @@ int main()
             free(subsamp);
         }
         
-    }
-    if(height % 2 == 1)
-    {
-        fread(rowBuffA, sizeof(uchar), rowBytesSize, bmpFile);
-        fseek(bmpFile, padSize, SEEK_CUR);
-        memcpy(rowBuffB, rowBuffA, rowBytesSize);
-        if(padSize % 2 == 1)
-        {
-            // JANKY SHIT BE HAPPNIN HERE
-            rowBuffA[rowBytesSize] = rowBuffA[rowBytesSize - 3];
-            rowBuffA[rowBytesSize + 1] = rowBuffA[rowBytesSize - 2];
-            rowBuffA[rowBytesSize + 2] = rowBuffA[rowBytesSize - 1];
-            rowBuffB[rowBytesSize] = rowBuffB[rowBytesSize - 3];
-            rowBuffB[rowBytesSize + 1] = rowBuffB[rowBytesSize - 2];
-            rowBuffB[rowBytesSize + 2] = rowBuffB[rowBytesSize - 1];
-        }
-        ulong j = 0;
-        for(;j<rowBytesSize;j+=6)
-        {
-            uchar * YCCBuff = malloc(12);
-            BGRtoYCC(rowBuffA + j);
-            BGRtoYCC(rowBuffA + j + 3);
-            BGRtoYCC(rowBuffB + j);
-            BGRtoYCC(rowBuffB + j + 3);
-            YCCBuff[0] = rowBuffA[j];
-            YCCBuff[1] = rowBuffA[j + 1];
-            YCCBuff[2] = rowBuffA[j + 2];
-            YCCBuff[3] = rowBuffA[j + 3];
-            YCCBuff[4] = rowBuffA[j + 4];
-            YCCBuff[5] = rowBuffA[j + 5];
-            YCCBuff[6] = rowBuffB[j];
-            YCCBuff[7] = rowBuffB[j + 1];
-            YCCBuff[8] = rowBuffB[j + 2];
-            YCCBuff[9] = rowBuffB[j + 3];
-            YCCBuff[10] = rowBuffB[j + 4];
-            YCCBuff[11] = rowBuffB[j + 5];
-
-            uchar * subsamp;
-            subsamp = SubSample(YCCBuff);
-            free(YCCBuff);
-            fwrite(subsamp, sizeof(uchar), 6, yccFile);
-            free(subsamp);
-        }
     }
     free(rowBuffA);
     free(rowBuffB);
@@ -230,11 +192,6 @@ int main()
             memcpy((rowBuffA + x + 3), shit + 1, 3);
             memcpy((rowBuffB + x), shit + 2, 3);
             memcpy((rowBuffB + x + 3), shit + 3, 3);
-            if(y==0 && x == 0){
-                printArray(YCCBuff, 12);
-                printArray((rowBuffA+x), 6);
-                printf("SHIT: %d %d %d %d\n\n", shit[0], shit[1], shit[2], shit[3]);
-            }
         }
         fwrite(rowBuffA, sizeof(uchar), rowBytesSize, newBmpFile);
         fwrite(pad, sizeof(uchar), padSize, newBmpFile);
