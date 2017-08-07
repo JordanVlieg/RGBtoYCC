@@ -61,17 +61,17 @@ void BGRtoYCC(uchar * colour)
     Y += _0dot257 * colour[2];
     Cb += _n0dot148 * colour[2];
     Cr += _0dot439 * colour[2];
-    colour[0] = ((Y+4096)>>13) + (scale >> 16); // 4096 is our magic rounding number for 3.13
-    colour[1] = ((Cb+4096)>>13) + ((scale >> 8) & 0xFF);
-    colour[2] = ((Cr+4096)>>13) + (scale & 0xFF);
+    colour[0] = ((Y+ROUNDING_CONST) >> MANTISSA_BITS) + (SCALE >> 16);
+    colour[1] = ((Cb+ROUNDING_CONST) >> MANTISSA_BITS) + ((SCALE >> 8) & 0xFF);
+    colour[2] = ((Cr+ROUNDING_CONST) >> MANTISSA_BITS) + (SCALE & 0xFF);
     return;
 }
 
 int YCCtoBGR(int colour)
 {
-    int yScaled = ((colour>>16) & 0xFF) - (scale >> 16);
-    int CbScaled = ((colour>>8) & 0xFF) - ((scale >> 8) & 0xFF);
-    int CrScaled = ((colour) & 0xFF) - (scale & 0xFF);
+    int yScaled = ((colour>>16) & 0xFF) - (SCALE >> 16);
+    int CbScaled = ((colour>>8) & 0xFF) - ((SCALE >> 8) & 0xFF);
+    int CrScaled = ((colour) & 0xFF) - (SCALE & 0xFF);
 
     int B, G, R;
     B = _1dot164 * yScaled;
@@ -87,9 +87,9 @@ int YCCtoBGR(int colour)
     R = (R >= 2088960) ? 2088960: R;
 
     colour = 0;
-    colour += ((B < 0) ? 0: ((B+4096)>>13)) << 0;
-    colour += ((G < 0) ? 0: ((G+4096)>>13)) << 8;
-    colour += ((R < 0) ? 0: ((R+4096)>>13)) << 16;
+    colour += ((B < 0) ? 0: ((B+ROUNDING_CONST)>>MANTISSA_BITS)) << 0;
+    colour += ((G < 0) ? 0: ((G+ROUNDING_CONST)>>MANTISSA_BITS)) << 8;
+    colour += ((R < 0) ? 0: ((R+ROUNDING_CONST)>>MANTISSA_BITS)) << 16;
     return colour;
 }
 
@@ -98,9 +98,9 @@ int YCCtoBGR(int colour)
     int * product = matrixMult(RGBtoYCCMatrix, RGB);
     static uchar ycc[3];
     // Loop unrolling for efficiency
-    ycc[0] = (product[0]+4096>>13) + scale[0]; //4096 is our magic rounding number for 3.13
-    ycc[1] = (product[1]+4096>>13) + scale[1];
-    ycc[2] = (product[2]+4096>>13) + scale[2];
+    ycc[0] = (product[0]+ROUNDING_CONST>>MANTISSA_BITS) + scale[0]; //ROUNDING_CONST is our magic rounding number for 3.13
+    ycc[1] = (product[1]+ROUNDING_CONST>>MANTISSA_BITS) + scale[1];
+    ycc[2] = (product[2]+ROUNDING_CONST>>MANTISSA_BITS) + scale[2];
     return ycc;
 }
 
@@ -111,9 +111,9 @@ uchar * YCCtoRGB(int YCC[3])
     YCC[2] = YCC[2] - scale[2];
     int * product = matrixMult(YCCtoRGBMatrix, YCC);
     static uchar rgb[3];
-    rgb[0] = (product[0]+4096>>13);
-    rgb[1] = (product[1]+4096>>13);
-    rgb[2] = (product[2]+4096>>13);
+    rgb[0] = (product[0]+ROUNDING_CONST>>MANTISSA_BITS);
+    rgb[1] = (product[1]+ROUNDING_CONST>>MANTISSA_BITS);
+    rgb[2] = (product[2]+ROUNDING_CONST>>MANTISSA_BITS);
     return rgb;
 }*/
 

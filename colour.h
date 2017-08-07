@@ -27,11 +27,10 @@
 #define _n0dot071       0xfffffdba
 #define _n0dot368       0xfffff439
 
-#define yScale          (uint16_t)16
-#define CbScale         (uint16_t)128
-#define CrScale         (uint16_t)128
+#define ROUNDING_CONST  4096
+#define MANTISSA_BITS   13
 
-#define scale           (int)((16<<16)+(128<<8)+128)
+#define SCALE           (int)((16<<16)+(128<<8)+128)
 
 void BGRtoYCC(uchar * colour);
 

@@ -230,11 +230,6 @@ int main()
             memcpy((rowBuffA + x + 3), shit + 1, 3);
             memcpy((rowBuffB + x), shit + 2, 3);
             memcpy((rowBuffB + x + 3), shit + 3, 3);
-            if(y==0 && x == 0){
-                printArray(YCCBuff, 12);
-                printArray((rowBuffA+x), 6);
-                printf("SHIT: %d %d %d %d\n\n", shit[0], shit[1], shit[2], shit[3]);
-            }
         }
         fwrite(rowBuffA, sizeof(uchar), rowBytesSize, newBmpFile);
         fwrite(pad, sizeof(uchar), padSize, newBmpFile);
