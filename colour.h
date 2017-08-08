@@ -8,8 +8,8 @@
 #define WINDOWS_NT_DIBSIZE  40
 #define false               0
 #define true                1
-#define INPUT_FILE           "./bunny.bmp"
-#define OUTPUT_FILE           "./bunnySUB.bmp"
+#define INPUT_FILE           "./Fox.bmp"
+#define OUTPUT_FILE           "./FoxSUB.bmp"
 #define COMPRESSED_FILE           "./ycc.jzv"
 // YCC to BGR
 #define _1dot164        0x253f
@@ -27,16 +27,17 @@
 #define _n0dot071       0xfffffdba
 #define _n0dot368       0xfffff439
 
+#define yScale          16
+#define CbScale         128
+#define CrScale         128
 #define ROUNDING_CONST  4096
 #define MANTISSA_BITS   13
 
-#define SCALE           (int)((16<<16)+(128<<8)+128)
-
-void BGRtoYCC(uchar * colour);
+int BGRtoYCC(int colour);
 
 int YCCtoBGR(int colour);
 
-uchar * SubSample(uchar * YCC);
+int * SubSample(int * pix);
 
 uchar * SuperSample(uchar * YCC);
 
