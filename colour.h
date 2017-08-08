@@ -37,7 +37,7 @@ int BGRtoYCC(int colour);
 
 int YCCtoBGR(int colour);
 
-uchar * SubSample(int * pix);
+int * SubSample(int * pix);
 
 uchar * SuperSample(uchar * YCC);
 

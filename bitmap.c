@@ -135,10 +135,14 @@ int main()
             shit[1] = BGRtoYCC(charArrToInt(rowBuffA + j + 3));
             shit[2] = BGRtoYCC(charArrToInt(rowBuffB + j));
             shit[3] = BGRtoYCC(charArrToInt(rowBuffB + j + 3));
-            uchar * subsamp;
+            int * subsamp;
             subsamp = SubSample(shit);
             free(YCCBuff);
-            fwrite(subsamp, sizeof(uchar), 6, yccFile);
+            uchar * buffer = malloc(6);
+            memcpy(buffer, subsamp, 4);
+            memcpy(buffer+4, subsamp+1, 2);
+            fwrite(buffer, sizeof(char), 6, yccFile);
+            //fwrite(subsamp+1, sizeof(char), 2, yccFile);
             free(subsamp);
         }
         

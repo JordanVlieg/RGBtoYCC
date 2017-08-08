@@ -3,17 +3,18 @@
 #include <inttypes.h>
 #include "colour.h"
 
-uchar * SubSample(int * pix)
+int * SubSample(int * pix)
 {
-    uchar * subSamp = calloc(6, sizeof(uchar));
-    subSamp[0] = ((pix[0] >> 16) & 0xFF);
-    subSamp[1] = (pix[1] >> 16) & 0xFF;
-    subSamp[2] = (pix[2] >> 16) & 0xFF;
-    subSamp[3] = (pix[3] >> 16) & 0xFF;
+    int * subSamp = calloc(2, sizeof(int));
+    int tmp = 0;
+    tmp += ((pix[0] >> 16) & 0xFF);
+    tmp += ((pix[1] >> 16) & 0xFF) << 8;
+    tmp += ((pix[2] >> 16) & 0xFF) << 16;
+    tmp += ((pix[3] >> 16) & 0xFF) << 24;
     int Cb = (((pix[0] >> 8) & 0xFF) + ((pix[1] >> 8) & 0xFF) + ((pix[2] >> 8) & 0xFF) + ((pix[3] >> 8) & 0xFF)) >> 2;
-    int Cr = ((pix[0] & 0xFF) + (pix[1] & 0xFF) + (pix[2] & 0xFF) + (pix[3] & 0xFF)) >> 2;
-    subSamp[4] = Cb;
-    subSamp[5] = Cr;
+    Cb += (((pix[0] & 0xFF) + (pix[1] & 0xFF) + (pix[2] & 0xFF) + (pix[3] & 0xFF)) >> 2) << 8;
+    subSamp[0] = tmp;
+    subSamp[1] = Cb;
     return subSamp;
 }
 
