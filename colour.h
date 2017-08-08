@@ -27,9 +27,9 @@
 #define _n0dot071       0xfffffdba
 #define _n0dot368       0xfffff439
 
-#define yScale          (uint16_t)16
-#define CbScale         (uint16_t)128
-#define CrScale         (uint16_t)128
+#define yScale          16
+#define CbScale         128
+#define CrScale         128
 
 #define scale           (int)((16<<16)+(128<<8)+128)
 

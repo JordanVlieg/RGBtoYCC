@@ -51,17 +51,17 @@ int BGRtoYCC(int colour)
     Cb += _n0dot148 * ((colour) & 0xFF);
     Cr += _0dot439 * ((colour) & 0xFF);
     colour ^= colour;
-    colour += (((Y+4096)>>13) + (scale >> 16)) << 16;
-    colour += (((Cb+4096)>>13) + ((scale >> 8) & 0xFF)) << 8;
-    colour += ((Cr+4096)>>13) + (scale & 0xFF);
+    colour += (((Y+4096)>>13) + yScale) << 16;
+    colour += (((Cb+4096)>>13) + CbScale) << 8;
+    colour += ((Cr+4096)>>13) + CrScale;
     return colour;
 }
 
 int YCCtoBGR(int colour)
 {
-    int yScaled = ((colour>>16) & 0xFF) - (scale >> 16);
-    int CbScaled = ((colour>>8) & 0xFF) - ((scale >> 8) & 0xFF);
-    int CrScaled = ((colour) & 0xFF) - (scale & 0xFF);
+    int yScaled = ((colour>>16) & 0xFF) - yScale;
+    int CbScaled = ((colour>>8) & 0xFF) - CbScale;
+    int CrScaled = ((colour) & 0xFF) - CrScale;
 
     int B, G, R;
     B = _1dot164 * yScaled;
@@ -113,15 +113,16 @@ void main()
     colourc[2] = colour[2];
     if(choice[0] > 1)
     {
+        BGRtoYCC(8287309);
         //YCCtoBGR(colourc);
-        printArray(colourc, 3);
+        //printArray(colourc, 3);
     }    
     else{
-        BGRtoYCC(colourc);
-        printArray(colourc, 3);
-        int blah = charArrToInt(colourc);
-        int newBlah = YCCtoBGR(blah);
-        printf("%d  %d  %d\n", newBlah>>24, (newBlah>>16)&0xFF, (newBlah>>8)&0xFF);
+        BGRtoYCC(8287309);
+        //printArray(colourc, 3);
+        //int blah = charArrToInt(colourc);
+        //int newBlah = YCCtoBGR(blah);
+        //printf("%d  %d  %d\n", newBlah>>24, (newBlah>>16)&0xFF, (newBlah>>8)&0xFF);
         //printArray(shit, 3);
         //free(shit);
     }  
