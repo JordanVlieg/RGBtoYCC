@@ -30,8 +30,8 @@
 #define yScale          16
 #define CbScale         128
 #define CrScale         128
-
-#define scale           (int)((16<<16)+(128<<8)+128)
+#define ROUNDING_CONST  4096
+#define MANTISSA_BITS   13
 
 int BGRtoYCC(int colour);
 

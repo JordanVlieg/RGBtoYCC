@@ -51,9 +51,9 @@ int BGRtoYCC(int colour)
     Cb += _n0dot148 * ((colour) & 0xFF);
     Cr += _0dot439 * ((colour) & 0xFF);
     colour ^= colour;
-    colour += (((Y+4096)>>13) + yScale) << 16;
-    colour += (((Cb+4096)>>13) + CbScale) << 8;
-    colour += ((Cr+4096)>>13) + CrScale;
+    colour += (((Y+ROUNDING_CONST) >> MANTISSA_BITS) + yScale) << 16;
+    colour += (((Cb+ROUNDING_CONST) >> MANTISSA_BITS) + CbScale) << 8;
+    colour += ((Cr+ROUNDING_CONST) >> MANTISSA_BITS) + CrScale;
     return colour;
 }
 
@@ -75,11 +75,11 @@ int YCCtoBGR(int colour)
     B = (B >= 2088960) ? 2088960: B;
     G = (G >= 2088960) ? 2088960: G;
     R = (R >= 2088960) ? 2088960: R;
-
-    colour ^= colour;
-    colour += ((B < 0) ? 0: ((B+4096)>>13)) << 0;
-    colour += ((G < 0) ? 0: ((G+4096)>>13)) << 8;
-    colour += ((R < 0) ? 0: ((R+4096)>>13)) << 16;
+    
+    colour = 0;
+    colour += ((B < 0) ? 0: ((B+ROUNDING_CONST)>>MANTISSA_BITS)) << 0;
+    colour += ((G < 0) ? 0: ((G+ROUNDING_CONST)>>MANTISSA_BITS)) << 8;
+    colour += ((R < 0) ? 0: ((R+ROUNDING_CONST)>>MANTISSA_BITS)) << 16;
     return colour;
 }
 
